@@ -77,6 +77,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 		$basePath = parse_url(get_rest_url(), PHP_URL_PATH);
 		$basePath = str_replace('index.php/', '',$basePath);
+		$basePath = rtrim($basePath, '/');
 
 		$swagger = array(
 			'swagger' => '2.0', 'info' => array(
