@@ -246,6 +246,17 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						$parameters[] = $parameter;
 					}
 
+					$isdupblicate = array();
+
+					foreach ($parameters as $index => $t) {
+						var_dump($t["name"]);
+						if (isset($isdupblicate[$t["name"]])) {
+							array_splice($parameters, $index, 1);
+							continue;
+						}
+						$isdupblicate[$t["name"]] = true;
+					}
+					
 					//If the endpoint is not grabbing a specific object then 
 					//assume it's returning a list
 					$outputSchemaForMethod = $outputSchema;
@@ -271,8 +282,11 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					}
 
 					$operationId = ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name"));
+
+					$tags = explode('/', $endpointName);
+
 					$swagger['paths'][$endpointName][strtolower($methodName)] = array(
-						'parameters' => $parameters, 'security' => $security, 'responses' => $responses, 'operationId' => $operationId
+						'parameters' => $parameters, 'security' => $security, 'responses' => $responses, 'operationId' => $operationId, 'tags' => $tags[1]
 					);
 				}
 			}
