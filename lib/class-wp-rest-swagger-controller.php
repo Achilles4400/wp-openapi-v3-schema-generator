@@ -82,7 +82,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		$swagger = array(
 			'swagger' => '2.0', 'info' => array(
 				'version' => '1.0', 'title' => $title
-			), 'host' => $host, 'basePath' => $basePath, 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'), 'consumes' => array('multipart/form-data'), 'produces' => array('application/json'), 'paths' => array(), 'definitions' => array(
+			), 'host' => $host, 'tags' => [], 'basePath' => $basePath, 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'), 'consumes' => array('multipart/form-data'), 'produces' => array('application/json'), 'paths' => array(), 'definitions' => array(
 				'wp_error' => array(
 					'properties' => array(
 						'code' => array(
@@ -145,6 +145,16 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		}
 
 		$restServer = rest_get_server();
+		$routes = $restServer->get_namespaces();
+		$tags = [];
+		foreach ($routes as $key => $value) {
+			if ($value == "apigenerate") {
+				continue;
+			}
+			$tags[] = array('name' => explode('/', $value)[0]);
+		}
+
+		$swagger['tags'] = $tags;
 
 		foreach ($restServer->get_routes() as $endpointName => $endpoint) {
 
@@ -286,7 +296,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					$tags = explode('/', $endpointName);
 
 					$swagger['paths'][$endpointName][strtolower($methodName)] = array(
-						'parameters' => $parameters, 'security' => $security, 'responses' => $responses, 'operationId' => $operationId, 'tags' => $tags[1]
+						'tags' => array($tags[1]), 'parameters' => $parameters, 'security' => $security, 'responses' => $responses, 'operationId' => $operationId
 					);
 				}
 			}
