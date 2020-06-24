@@ -4,7 +4,7 @@
  * Description: Swagger for the WP REST API
  * Author: Vincent Bathellier
  * Author URI: 
- * Version: 1.0.0
+ * Version: 1.0.1
  * Plugin URI: https://github.com/Achilles4400/wp-api-swaggerui.git
  * License: Cobeia
  */

@@ -3,7 +3,7 @@
   "description": "Generate a swagger file for your Wordpress, based on the plugins installed.",
   "keywords": ["wordpress", "plugin", "starfishmod", "API", "swagger"],
   "homepage": "https://github.com/Achilles4400/wp-api-swaggerui.git",
-  "license": "MIT",
+  "license": "Cobeia",
   "authors": [
     {
       "name": "achilles4400",
