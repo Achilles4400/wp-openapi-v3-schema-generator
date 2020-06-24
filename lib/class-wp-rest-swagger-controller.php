@@ -231,6 +231,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							if ($pdetails['type'] == 'array') {
 								$parameter['type'] = $pdetails['type'];
 								$parameter['items'] = array('type' => 'string');
+								if (isset($pdetails['items']['enum'])) {
+									$parameter['items']['enum'] = $pdetails['items']['enum'];
+								}
 								if (isset($parameter['default']) && !is_array($parameter['default']) && $parameter['default'] != null) {
 									$parameter['default'] = array($parameter['default']);
 								}
