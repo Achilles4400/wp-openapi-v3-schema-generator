@@ -1,7 +1,7 @@
 {
-  "name": "achilles4400/WPAPI-SwaggerGenerator",
+  "name": "achilles4400/Cobeia-WPAPI-SwaggerGenerator",
   "description": "Generate a swagger file for your Wordpress, based on the plugins installed.",
-  "keywords": ["wordpress", "plugin", "starfishmod", "API", "swagger"],
+  "keywords": ["wordpress", "plugin", "cobeia", "API", "swagger"],
   "homepage": "https://github.com/Achilles4400/wp-api-swaggerui.git",
   "license": "Cobeia",
   "authors": [

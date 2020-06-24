@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Cobeia WP REST API - Swagger generate
- * Description: Swagger for the WP REST API
+ * Description: Cobeia Swagger schema for the WP REST API
  * Author: Vincent Bathellier
  * Author URI: 
  * Version: 1.0.1
