@@ -169,10 +169,10 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				$schema = call_user_func(array(
 					$routeopt['schema'][0], $routeopt['schema'][1]
 				));
-				if ($schema['title']) {
+				if (isset($schema['title']) && $schema['title']) {
 					$swagger['definitions'][$schema['title']] = $this->schemaIntoDefinition($schema);
+					$outputSchema = array('$ref' => '#/definitions/' . $schema['title']);
 				}
-				$outputSchema = array('$ref' => '#/definitions/' . $schema['title']);
 			} else {
 				//if there is no schema then it's a safe bet that this API call 
 				//will not work - move to the next one.
@@ -231,7 +231,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							if ($pdetails['type'] == 'array') {
 								$parameter['type'] = $pdetails['type'];
 								$parameter['items'] = array('type' => 'string');
-								if (!is_array($parameter['default']) && $parameter['default'] != null) {
+								if (isset($parameter['default']) && !is_array($parameter['default']) && $parameter['default'] != null) {
 									$parameter['default'] = array($parameter['default']);
 								}
 							} elseif ($pdetails['type'] == 'object') {
@@ -245,7 +245,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							} else {
 								$parameter['type'] = $pdetails['type'];
 							}
-							if (is_array($parameter['default']) && $parameter['type'] == 'string') {
+							if (isset($parameter['default']) && is_array($parameter['default']) && $parameter['type'] == 'string') {
 								$parameter['default'] = "";
 							}
 						}
@@ -259,7 +259,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					$isdupblicate = array();
 
 					foreach ($parameters as $index => $t) {
-						var_dump($t["name"]);
 						if (isset($isdupblicate[$t["name"]])) {
 							array_splice($parameters, $index, 1);
 							continue;
@@ -332,7 +331,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 			//-- Changes by Richi
 			if (!empty($prop['enum'])) {
-				if ($prop['enum'][0] == "") {
+				if (isset($prop['enum'][0]) && $prop['enum'][0] == "") {
 					if (count($prop['enum']) > 1) {
 						array_shift($prop['enum']);
 					} else {
