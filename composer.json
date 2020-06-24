@@ -1,13 +1,13 @@
 {
-  "name": "starfishmod/WPAPI-SwaggerGenerator",
+  "name": "achilles4400/WPAPI-SwaggerGenerator",
   "description": "Generate a swagger file for your Wordpress, based on the plugins installed.",
   "keywords": ["wordpress", "plugin", "starfishmod", "API", "swagger"],
-  "homepage": "https://github.com/starfishmod/WPAPI-SwaggerGenerator",
+  "homepage": "https://github.com/Achilles4400/wp-api-swaggerui.git",
   "license": "MIT",
   "authors": [
     {
-      "name": "starfishmod",
-      "homepage": "https://github.com/starfishmod"
+      "name": "achilles4400",
+      "homepage": "https://github.com/Achilles4400"
     }
   ],
   "type": "wordpress-plugin",

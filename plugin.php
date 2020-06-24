@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: WP REST API - Swagger generate
+ * Plugin Name: Cobeia WP REST API - Swagger generate
  * Description: Swagger for the WP REST API
  * Author: Vincent Bathellier
  * Author URI: 
  * Version: 1.0.0
  * Plugin URI: https://github.com/Achilles4400/wp-api-swaggerui.git
- * License: GPL2+
+ * License: Cobeia
  */
 
 function swagger_rest_api_init() {
