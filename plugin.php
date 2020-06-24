@@ -2,10 +2,10 @@
 /**
  * Plugin Name: WP REST API - Swagger generate
  * Description: Swagger for the WP REST API
- * Author: Andrew Mee
+ * Author: Vincent Bathellier
  * Author URI: 
- * Version: 0.0.2
- * Plugin URI: https://github.com/starfishmod/WPAPI-SwaggerGenerator
+ * Version: 1.0.0
+ * Plugin URI: https://github.com/Achilles4400/wp-api-swaggerui.git
  * License: GPL2+
  */
 
