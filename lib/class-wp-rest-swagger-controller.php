@@ -263,12 +263,22 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 					foreach ($parameters as $index => $t) {
 						if (isset($isdupblicate[$t["name"]])) {
+							// var_dump($endpointPart['args']);
 							array_splice($parameters, $index, 1);
 							continue;
 						}
 						$isdupblicate[$t["name"]] = true;
 					}
-					
+
+					$isdupblicate2 = array();
+					foreach ($parameters as $index => $t) {
+						if (isset($isdupblicate2[$t["name"]])) {
+							array_splice($parameters, $index, 1);
+							continue;
+						}
+						$isdupblicate2[$t["name"]] = true;
+					}
+
 					//If the endpoint is not grabbing a specific object then 
 					//assume it's returning a list
 					$outputSchemaForMethod = $outputSchema;
