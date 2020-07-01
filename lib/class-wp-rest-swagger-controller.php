@@ -359,7 +359,11 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			//--
 
 			if ($prop['type'] == 'array') {
-				$prop['items'] = array('type' => 'string');
+				if ($prop['items']['type'] === 'object') {
+					$prop['items'] = $this->schemaIntoDefinition($prop['items']);
+				} else {
+					$prop['items'] = array('type' => 'string');
+				}
 			} elseif ($prop['type'] == 'date-time') {
 				$prop['type'] = 'string';
 				$prop['format'] = 'date-time';
