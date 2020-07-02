@@ -335,6 +335,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		}
 
 		foreach ($schema['properties'] as $name => &$prop) {
+			if (!empty($prop['arg_options'])) unset($prop['arg_options']);
 
 			if (!empty($prop['properties'])) {
 				$prop = $this->schemaIntoDefinition($prop);
@@ -357,14 +358,17 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				unset($prop['default']);
 			}
 			//--
-
+			if ($prop['type'] == 'object' && !isset($prop['properties'])) {
+				if (!empty($prop['items'])) unset($prop['items']);
+				$prop['properties'] = array('id' => array('type' => 'integer'));
+			}
 			if ($prop['type'] == 'array') {
 				if (isset($prop['items']['type']) && $prop['items']['type'] === 'object') {
-					$prop['nullable'] = true;
-					$prop['items'] = $this->schemaIntoDefinition($prop['items']);
-				} else {
-					$prop['nullable'] = true;
+					$prop['items'] = new stdClass();
+				} else if (isset($prop['items']['type'])) {
 					$prop['items'] = array('type' => $prop['items']['type']);
+				} else {
+					$prop['items'] = array('type' => 'string');
 				}
 			} elseif ($prop['type'] == 'date-time') {
 				$prop['type'] = 'string';
