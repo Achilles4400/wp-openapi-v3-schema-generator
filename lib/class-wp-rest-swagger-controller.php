@@ -166,6 +166,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 			$routeopt = $restServer->get_route_options($endpointName);
 			if (!empty($routeopt['schema'][1])) {
+
 				$schema = call_user_func(array(
 					$routeopt['schema'][0], $routeopt['schema'][1]
 				));
@@ -283,7 +284,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					//assume it's returning a list
 					$outputSchemaForMethod = $outputSchema;
 					if ($methodName == 'GET' && !preg_match('/}$/', $endpointName)) {
-						if (!preg_match('/activity\/{id}\/comment/', $endpointName)) {
+						if (!preg_match('/activity\/{id}\/comment/', $endpointName) && !preg_match('/\/me/', $endpointName)) {
 							$outputSchemaForMethod = array(
 								'type' => 'array', 'items' => $outputSchemaForMethod
 							);
