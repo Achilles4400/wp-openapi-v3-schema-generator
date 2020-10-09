@@ -284,7 +284,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					//assume it's returning a list
 					$outputSchemaForMethod = $outputSchema;
 					if ($methodName == 'GET' && !preg_match('/}$/', $endpointName)) {
-						if (!preg_match('/activity\/{id}\/comment/', $endpointName) && !preg_match('/\/me/', $endpointName)) {
+						if (!preg_match('/activity\/{id}\/comment/', $endpointName) && !preg_match('/members\/me/', $endpointName) && !preg_match('/users\/me/', $endpointName)) {
 							$outputSchemaForMethod = array(
 								'type' => 'array', 'items' => $outputSchemaForMethod
 							);
