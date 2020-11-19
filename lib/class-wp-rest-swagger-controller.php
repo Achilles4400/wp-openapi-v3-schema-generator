@@ -171,8 +171,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					$routeopt['schema'][0], $routeopt['schema'][1]
 				));
 				if (isset($schema['title']) && $schema['title']) {
-					$swagger['definitions'][$schema['title']] = $this->schemaIntoDefinition($schema);
-					$outputSchema = array('$ref' => '#/definitions/' . $schema['title']);
+					$swagger['definitions'][str_replace(" ", "_", $schema['title'])] = $this->schemaIntoDefinition($schema);
+					$outputSchema = array('$ref' => '#/definitions/' . str_replace(" ", "_", $schema['title']));
 				}
 			} else {
 				//if there is no schema then it's a safe bet that this API call 
@@ -200,7 +200,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			if (empty($swagger['paths'][$endpointName])) {
 				$swagger['paths'][$endpointName] = array();
 			}
-
 
 			foreach ($endpoint as $endpointPart) {
 
