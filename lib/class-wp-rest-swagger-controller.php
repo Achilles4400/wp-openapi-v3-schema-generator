@@ -148,6 +148,11 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		$routes = $restServer->get_namespaces();
 		$tags = [];
 		foreach ($routes as $key => $value) {
+			if (defined('COBEIA_API_SCHEMA')) {
+				if (!in_array($value, COBEIA_API_SCHEMA)) {
+					continue;
+				}
+			}
 			if ($value == "apigenerate") {
 				continue;
 			}
@@ -161,6 +166,15 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			// don't include self - that's a bit meta
 			if ($endpointName == '/' . $this->namespace . '/swagger') {
 				continue;
+			}
+			if (defined('COBEIA_API_SCHEMA')) {
+				if (!array_filter(COBEIA_API_SCHEMA, function($filter_endpoint) use ($endpointName) {
+					if (strpos($endpointName, $filter_endpoint) !== false) {
+						return $endpointName;
+					}
+				})) {
+					continue;
+				}
 			}
 
 
