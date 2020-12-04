@@ -302,6 +302,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							'name' => 'body',
 							'schema' => array(
 								'type' => 'object',
+								'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")),
 								'properties' => $properties
 							)
 						);
