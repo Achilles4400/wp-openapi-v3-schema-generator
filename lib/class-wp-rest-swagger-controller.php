@@ -82,7 +82,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		$swagger = array(
 			'swagger' => '2.0', 'info' => array(
 				'version' => '1.0', 'title' => $title
-			), 'host' => $host, 'tags' => [], 'basePath' => $basePath, 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'), 'consumes' => array('multipart/form-data'), 'produces' => array('application/json'), 'paths' => array(), 'definitions' => array(
+			), 'host' => $host, 'tags' => [], 'basePath' => $basePath, 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'), 'consumes' => array('application/json', 'multipart/form-data'), 'produces' => array('application/json'), 'paths' => array(), 'definitions' => array(
 				'wp_error' => array(
 					'properties' => array(
 						'code' => array(
@@ -195,8 +195,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				continue;
 			}
 
-
-
 			$defaultidParams = array();
 			//Replace endpoints var and add to the parameters required
 			$endpointName = preg_replace_callback(
@@ -222,6 +220,15 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					if (in_array($methodName, array('PUT', 'PATCH'))) continue; //duplicated by post
 
 					$parameters = $defaultidParams;
+					$schema = array();
+					// if ($methodName === 'POST') {
+					// 	$bodyParameters = array(
+					// 		'in' => 'body',
+					// 		'name' => 'body',
+					// 		'schema' => $schema
+					// 	);
+					// 	$parameters[] = $bodyParameters;
+					// }
 
 					//Clean up parameters
 					foreach ($endpointPart['args'] as $pname => $pdetails) {
@@ -274,27 +281,33 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							$parameter['enum'] = array_values($pdetails['enum']);
 						}
 
-						$parameters[] = $parameter;
+						if ($methodName === 'POST') {
+							unset($parameter['in']);
+							// var_dump($parameter);
+							array_push($schema, $parameter);
+						} else {
+							$parameters[] = $parameter;
+						}
 					}
 
-					$isdupblicate = array();
-
-					foreach ($parameters as $index => $t) {
-						if (isset($isdupblicate[$t["name"]])) {
-							// var_dump($endpointPart['args']);
-							array_splice($parameters, $index, 1);
-							continue;
+					// var_dump($bodyParameters);
+					if ($methodName === 'POST' && !empty($schema)) {
+						$this->removeDuplicates($schema);
+						$properties = array();
+						foreach ($schema as $index => $t) {
+							$properties[$t['name']] = $t;
 						}
-						$isdupblicate[$t["name"]] = true;
-					}
-
-					$isdupblicate2 = array();
-					foreach ($parameters as $index => $t) {
-						if (isset($isdupblicate2[$t["name"]])) {
-							array_splice($parameters, $index, 1);
-							continue;
-						}
-						$isdupblicate2[$t["name"]] = true;
+						$bodyParameters = array(
+							'in' => 'body',
+							'name' => 'body',
+							'schema' => array(
+								'type' => 'object',
+								'properties' => $properties
+							)
+						);
+						$parameters[] = $bodyParameters;
+					} else {
+						$this->removeDuplicates($parameters);
 					}
 
 					//If the endpoint is not grabbing a specific object then 
@@ -337,6 +350,26 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		$response = rest_ensure_response($swagger);
 
 		return apply_filters('rest_prepare_meta_value', $response, $request);
+	}
+
+	private function removeDuplicates($params) {
+		$isdupblicate = array();
+		foreach ($params as $index => $t) {
+			if (isset($isdupblicate[$t["name"]])) {
+				array_splice($params, $index, 1);
+				continue;
+			}
+			$isdupblicate[$t["name"]] = true;
+		}
+
+		$isdupblicate2 = array();
+		foreach ($params as $index => $t) {
+			if (isset($isdupblicate2[$t["name"]])) {
+				array_splice($params, $index, 1);
+				continue;
+			}
+			$isdupblicate2[$t["name"]] = true;
+		}
 	}
 
 	/**
