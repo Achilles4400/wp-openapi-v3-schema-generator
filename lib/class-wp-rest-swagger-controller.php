@@ -80,33 +80,45 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		$basePath = rtrim($basePath, '/');
 
 		$swagger = array(
-			'swagger' => '2.0', 'info' => array(
-				'version' => '1.0', 'title' => $title
-			), 'host' => $host, 'tags' => [], 'basePath' => $basePath, 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'), 'consumes' => array('application/json', 'multipart/form-data'), 'produces' => array('application/json'), 'paths' => array(), 'definitions' => array(
-				'wp_error' => array(
-					'properties' => array(
-						'code' => array(
-							'type' => 'string'
-						), 'message' => array(
-							'type' => 'string'
-						), 'data' => array(
-							'type' => 'object', 'properties' => array(
-								'status' => array(
-									'type' => 'integer'
+			'openapi' => '3.0.3',
+			'info' => array(
+				'version' => '1.0',
+				'title' => $title
+			),
+			// 'host' => $host,
+			'tags' => [],
+			// 'basePath' => $basePath,
+			// 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'),
+			// 'consumes' => array('application/json', 'multipart/form-data'),
+			// 'produces' => array('application/json'),
+			'paths' => array(),
+			'components' => array(
+				'schemas' => array(
+					'wp_error' => array(
+						'properties' => array(
+							'code' => array(
+								'type' => 'string'
+							), 'message' => array(
+								'type' => 'string'
+							), 'data' => array(
+								'type' => 'object', 'properties' => array(
+									'status' => array(
+										'type' => 'integer'
+									)
 								)
 							)
 						)
 					)
+				),
+				'securitySchemes' => array(
+					"cookieAuth" => array(
+						"type" => "apiKey",
+						"name" => "X-WP-Nonce",
+						"in" => "header",
+						"description" => "Please see http://v2.wp-api.org/guide/authentication/"
+					)
 				)
-			), 'securityDefinitions' => array(
-				"cookieAuth" => array(
-					"type" => "apiKey",
-					"name" => "X-WP-Nonce",
-					"in" => "header",
-					"description" => "Please see http://v2.wp-api.org/guide/authentication/"
-				)
-
-			)
+			),
 		);
 
 		$security = array(
@@ -115,7 +127,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 
 		if (function_exists('rest_oauth1_init')) {
-			$swagger['securityDefinitions']['oauth'] = array(
+			$swagger['components']['securitySchemes']['oauth'] = array(
 				'type' => 'oauth2', 'x-oauth1' => true, 'flow' => 'accessCode', 'authorizationUrl' => $this->getSiteRoot('oauth1/authorize'), 'tokenUrl' =>  $this->getSiteRoot('oauth1/request'), 'x-accessUrl' =>  $this->getSiteRoot('oauth1/access'), 'scopes' => array(
 					'basic' => 'OAuth authentication uses the OAuth 1.0a specification (published as RFC5849)'
 				)
@@ -129,7 +141,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 			if ($wp_rewrite->using_index_permalinks()) $rootURL .= '/' . $wp_rewrite->index;
 
-			$swagger['securityDefinitions']['oauth'] = array(
+			$swagger['components']['securitySchemes']['oauth'] = array(
 				'type' => 'oauth2', 'flow' => 'accessCode', 'authorizationUrl' => $rootURL . '/oauth/authorize', 'tokenUrl' => $rootURL . '/oauth/token', 'scopes' => array(
 					'openid' => 'openid'
 				)
@@ -138,8 +150,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		}
 
 		if (class_exists('Application_Passwords') || function_exists('json_basic_auth_handler')) {
-			$swagger['securityDefinitions']['basicAuth'] = array(
-				'type' => 'basic'
+			$swagger['components']['securitySchemes']['basicAuth'] = array(
+				'scheme' => 'basic',
+				'type' => (is_ssl() | force_ssl_admin()) ? 'https' : 'http'
 			);
 			$security[] = 	array('basicAuth' => array(''));
 		}
@@ -186,8 +199,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				));
 				if (isset($schema['title']) && $schema['title']) {
 					$schema['title'] = str_replace("/", "_", $routeopt['namespace']) . '_' . str_replace(" ", "_", $schema['title']);
-					$swagger['definitions'][$schema['title']] = $this->schemaIntoDefinition($schema);
-					$outputSchema = array('$ref' => '#/definitions/' . $schema['title']);
+					$swagger['components']['schemas'][$schema['title']] = $this->schemaIntoDefinition($schema);
+					$outputSchema = array('$ref' => '#/components/schemas/' . $schema['title']);
 				}
 			} else {
 				//if there is no schema then it's a safe bet that this API call 
@@ -201,7 +214,12 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				'#\(\?P<(\w+?)>.*?\)#',
 				function ($matches) use (&$defaultidParams) {
 					$defaultidParams[] = array(
-						'name' => $matches[1], 'type' => 'string', 'in' => 'path', 'required' => true
+						'name' => $matches[1],
+						'in' => 'path',
+						'required' => true,
+						'schema' => array(
+							'type' => 'string'
+						)
 					);
 					return '{' . $matches[1] . '}';
 				},
@@ -221,14 +239,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 					$parameters = $defaultidParams;
 					$schema = array();
-					// if ($methodName === 'POST') {
-					// 	$bodyParameters = array(
-					// 		'in' => 'body',
-					// 		'name' => 'body',
-					// 		'schema' => $schema
-					// 	);
-					// 	$parameters[] = $bodyParameters;
-					// }
 
 					//Clean up parameters
 					foreach ($endpointPart['args'] as $pname => $pdetails) {
@@ -237,55 +247,70 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							'name' => $pname, 'type' => 'string', 'in' => $methodName == 'POST' ? 'formData' : 'query'
 						);
 						if (!empty($pdetails['description'])) $parameter['description'] = $pdetails['description'];
-						if (!empty($pdetails['format'])) $parameter['format'] = $pdetails['format'];
-						if (!empty($pdetails['default'])) $parameter['default'] = $pdetails['default'];
-						if (!empty($pdetails['enum'])) $parameter['enum'] = $pdetails['enum'];
+						if (!empty($pdetails['format'])) $parameter['schema']['format'] = $pdetails['format'];
+						if (!empty($pdetails['default'])) $parameter['schema']['default'] = $pdetails['default'];
+						if (!empty($pdetails['enum'])) $parameter['schema']['enum'] = array_values($pdetails['enum']);
+						// if (is_object($pdetails['enum'])) {
+						// 	var_dump($pdetails);
+						// 	$parameter['schema']['enum'] = get_object_vars($pdetails['enum']);
+
+						// } 
 						if (!empty($pdetails['required'])) $parameter['required'] = $pdetails['required'];
 						if (!empty($pdetails['minimum'])) {
-							$parameter['minimum'] = $pdetails['minimum'];
-							$parameter['format'] = 'number';
+							$parameter['schema']['minimum'] = $pdetails['minimum'];
+							$parameter['schema']['format'] = 'number';
 						}
 						if (!empty($pdetails['maximum'])) {
-							$parameter['maximum'] = $pdetails['maximum'];
-							$parameter['format'] = 'number';
+							$parameter['schema']['maximum'] = $pdetails['maximum'];
+							$parameter['schema']['format'] = 'number';
 						}
 						if (!empty($pdetails['type'])) {
 							if ($pdetails['type'] == 'array') {
-								$parameter['type'] = $pdetails['type'];
-								$parameter['items'] = array('type' => 'string');
+								$parameter['schema']['type'] = $pdetails['type'];
+								$parameter['schema']['items'] = array('type' => 'string');
 								if (isset($pdetails['items']['enum'])) {
-									$parameter['items']['enum'] = $pdetails['items']['enum'];
+									$parameter['schema']['items']['enum'] = $pdetails['items']['enum'];
 								}
 								if ($pdetails['items']['type'] == 'object' && isset($pdetails['items']['properties'])) {
-									$parameter['items'] = array('type' => 'object', 'properties' => $pdetails['items']['properties']);
+									$parameter['schema']['items'] = array(
+										'type' => 'object',
+										'properties' => $pdetails['items']['properties']
+									);
+									$parameter['schema']['items']['properties'] = $this->cleanParameter($parameter['schema']['items']['properties']);
+									// foreach ($parameter['schema']['items']['properties'] as $key => $t) {
+									// 	if (is_array($t['type'])) $parameter['schema']['items']['properties'][$key]['type'] = $t['type'][0];
+									// 	if (isset($t['context'])) unset($parameter['schema']['items']['properties'][$key]['context']);
+									// 	if (isset($t['readonly'])) unset($parameter['schema']['items']['properties'][$key]);
+									// }
 								}
-								if (isset($parameter['default']) && !is_array($parameter['default']) && $parameter['default'] != null) {
-									$parameter['default'] = array($parameter['default']);
+								if (isset($parameter['schema']['default']) && !is_array($parameter['schema']['default']) && $parameter['schema']['default'] != null) {
+									$parameter['schema']['default'] = array($parameter['default']);
 								}
 							} elseif ($pdetails['type'] == 'object') {
-								$parameter['type'] = 'string';
+								$parameter['schema']['type'] = 'string';
 							} elseif ($pdetails['type'] == 'date-time') {
-								$parameter['type'] = 'string';
-								$parameter['format'] = 'date-time';
+								$parameter['schema']['type'] = 'string';
+								$parameter['schema']['format'] = 'date-time';
 							} elseif (is_array($pdetails['type']) && in_array('string', $pdetails['type'])) {
-								$parameter['type'] = 'string';
-								$parameter['format'] = 'date-time';
+								$parameter['schema']['type'] = 'string';
+								$parameter['schema']['format'] = 'date-time';
 							} else {
-								$parameter['type'] = $pdetails['type'];
+								$parameter['schema']['type'] = $pdetails['type'];
 							}
 							if (isset($parameter['default']) && is_array($parameter['default']) && $parameter['type'] == 'string') {
-								$parameter['default'] = "";
+								$parameter['schema']['default'] = "";
 							}
 						}
-						if (isset($pdetails['enum'])) {
-							$parameter['enum'] = array_values($pdetails['enum']);
-						}
+						// if (isset($pdetails['enum'])) {
+						// 	$parameter['enum'] = array_values($pdetails['enum']);
+						// }
 
 						if ($methodName === 'POST') {
 							unset($parameter['in']);
-							// var_dump($parameter);
+							unset($parameter['required']);
 							array_push($schema, $parameter);
 						} else {
+							unset($parameter['type']);
 							$parameters[] = $parameter;
 						}
 					}
@@ -296,17 +321,13 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						$properties = array();
 						foreach ($schema as $index => $t) {
 							$properties[$t['name']] = $t;
+							$properties[$t['name']]['type'] = $properties[$t['name']]['schema']['type'];
+							if (!empty($properties[$t['name']]['schema']['items'])) $properties[$t['name']]['items'] = $properties[$t['name']]['schema']['items'];
+							if (!empty($properties[$t['name']]['schema']['enum'])) $properties[$t['name']]['enum'] = $properties[$t['name']]['schema']['enum'];
+							unset($properties[$t['name']]['schema']['type']);
+							unset($properties[$t['name']]['name']);
+							unset($properties[$t['name']]['schema']);
 						}
-						$bodyParameters = array(
-							'in' => 'body',
-							'name' => 'body',
-							'schema' => array(
-								'type' => 'object',
-								'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")),
-								'properties' => $properties
-							)
-						);
-						$parameters[] = $bodyParameters;
 					} else {
 						$this->removeDuplicates($parameters);
 					}
@@ -324,16 +345,32 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 					$responses = array(
 						200 => array(
-							'description' => "successful operation", 'schema' => $outputSchemaForMethod
-						), 'default' => array(
-							'description' => "error", 'schema' => array('$ref' => '#/definitions/wp_error')
+							'description' => "successful operation",
+							'content' => array(
+								'application/json' => array(
+									'schema' => $outputSchemaForMethod
+								)
+							)
+						),
+						'default' => array(
+							'description' => "error",
+							'content' => array(
+								'application/json' => array(
+									'schema' => array('$ref' => '#/components/schemas/wp_error')
+								)
+							)
 						)
 					);
 
 					if (in_array($methodName, array('POST', 'PATCH', 'PUT')) && !preg_match('/}$/', $endpointName)) {
 						//This are actually 201's in the default API - but joy of joys this is unreliable
 						$responses[201] = array(
-							'description' => "successful operation", 'schema' => $outputSchemaForMethod
+							'description' => "successful operation",
+							'content' => array(
+								'application/json' => array(
+									'schema' => $outputSchemaForMethod
+								)
+							)
 						);
 					}
 
@@ -344,6 +381,21 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					$swagger['paths'][$endpointName][strtolower($methodName)] = array(
 						'tags' => array($tags[1]), 'parameters' => $parameters, 'security' => $security, 'responses' => $responses, 'operationId' => $operationId
 					);
+					if ($methodName === 'POST' && !empty($schema)) {
+						$swagger['paths'][$endpointName][strtolower($methodName)]['requestBody'] = array(
+							// 'in' => 'body',
+							// 'name' => 'body',
+							'content' => array(
+								'application/json' => array(
+									'schema' => array(
+										'type' => 'object',
+										// 'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")),
+										'properties' => $properties
+									)
+								)
+							)
+						);
+					}
 				}
 			}
 		}
@@ -351,6 +403,25 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		$response = rest_ensure_response($swagger);
 
 		return apply_filters('rest_prepare_meta_value', $response, $request);
+	}
+
+	private function cleanParameter($properties) {
+		// var_dump($properties);
+		foreach ($properties as $key => $t) {
+			if ($properties[$key]['type'] == 'array') {
+				if ($properties[$key]['items']['type'] == 'object') {
+					$properties[$key]['items']['properties'] = $this->cleanParameter($properties[$key]['items']['properties']);
+				}
+			}
+			if ($properties[$key]['type'] == 'object') {
+				$properties[$key]['properties'] = $this->cleanParameter($properties[$key]['properties']);
+			} else {
+				if (is_array($t['type'])) $properties[$key]['type'] = $t['type'][0];
+				if (isset($t['context'])) unset($properties[$key]['context']);
+				if (isset($t['readonly'])) unset($properties[$key]);
+			}
+		}
+		return $properties;
 	}
 
 	private function removeDuplicates($params) {
@@ -382,6 +453,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 	private function schemaIntoDefinition($schema) {
 		if (!empty($schema['$schema'])) unset($schema['$schema']);
 		if (!empty($schema['links'])) unset($schema['links']);
+		if (!empty($schema['readonly'])) unset($schema['readonly']);
 		// if(!empty($schema['title']))unset($schema['title']);
 
 		if (empty($schema['properties'])) {
@@ -390,12 +462,28 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 		foreach ($schema['properties'] as $name => &$prop) {
 			if (!empty($prop['arg_options'])) unset($prop['arg_options']);
+			if (!empty($prop['$schema'])) unset($prop['$schema']);
+			if (!empty($prop['in'])) unset($prop['in']);
+			if (!empty($prop['validate_callback'])) unset($prop['validate_callback']);
+			if (!empty($prop['context'])) unset($prop['context']);
+			if (!empty($prop['readonly'])) unset($prop['readonly']);
+			if (!empty($prop['items']['context'])) unset($prop['items']['context']);
+			if (is_array($prop['default'])) unset($prop['default']);
+			if (is_array($prop['type'])) $prop['type'] = $prop['type'][0];
+			if (empty($prop['default'])) unset($prop['default']);
 
 			if (!empty($prop['properties'])) {
+				$prop['type'] = 'object';
+				unset($prop['default']);
 				$prop = $this->schemaIntoDefinition($prop);
 			} else if (isset($prop['properties'])) {
 				$prop['properties'] = new stdClass();
 			}
+
+			// if (isset($prop['items'])) {
+			// 	$prop['type'] = 'array';
+			// 	unset($prop['default']);
+			// }
 
 			//-- Changes by Richi
 			if (!empty($prop['enum'])) {
