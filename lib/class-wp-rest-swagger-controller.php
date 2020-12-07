@@ -86,6 +86,11 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			),
 			// 'host' => $host,
 			'tags' => [],
+			'servers' => array(
+				array(
+					'url' => get_rest_url()
+				)
+			),
 			// 'basePath' => $basePath,
 			// 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'),
 			// 'consumes' => array('application/json', 'multipart/form-data'),
