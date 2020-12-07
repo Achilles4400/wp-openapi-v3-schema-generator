@@ -25,7 +25,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				'args'                => $this->get_swagger_params(),
 			),
 
-
 			'schema' => array($this, 'get_swagger_schema'),
 		));
 	}
@@ -377,7 +376,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 								'application/json' => array(
 									'schema' => array(
 										'type' => 'object',
-										'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")),
+										'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")) . 'Input',
 										'properties' => $properties
 									)
 								)
