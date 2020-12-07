@@ -241,6 +241,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				foreach ($endpointPart['methods'] as $methodName => $method) {
 					if (in_array($methodName, array('PUT', 'PATCH'))) continue; //duplicated by post
 
+					$pathParamName = array_map(function ($param) { return $param['name']; }, $defaultidParams);
+
 					$parameters = $defaultidParams;
 					$schema = array();
 
@@ -296,17 +298,18 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							}
 						}
 
-						if ($methodName === 'POST') {
-							unset($parameter['in']);
-							unset($parameter['required']);
-							array_push($schema, $parameter);
-						} else {
-							unset($parameter['type']);
-							$parameters[] = $parameter;
+						if (!in_array($parameter['name'], $pathParamName)) {
+							if ($methodName === 'POST') {
+								unset($parameter['in']);
+								unset($parameter['required']);
+								array_push($schema, $parameter);
+							} else {
+								unset($parameter['type']);
+								$parameters[] = $parameter;
+							}
 						}
 					}
-
-					// var_dump($bodyParameters);
+;
 					if ($methodName === 'POST' && !empty($schema)) {
 						$this->removeDuplicates($schema);
 						$properties = array();
