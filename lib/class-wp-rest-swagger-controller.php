@@ -250,11 +250,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						if (!empty($pdetails['format'])) $parameter['schema']['format'] = $pdetails['format'];
 						if (!empty($pdetails['default'])) $parameter['schema']['default'] = $pdetails['default'];
 						if (!empty($pdetails['enum'])) $parameter['schema']['enum'] = array_values($pdetails['enum']);
-						// if (is_object($pdetails['enum'])) {
-						// 	var_dump($pdetails);
-						// 	$parameter['schema']['enum'] = get_object_vars($pdetails['enum']);
-
-						// } 
 						if (!empty($pdetails['required'])) $parameter['required'] = $pdetails['required'];
 						if (!empty($pdetails['minimum'])) {
 							$parameter['schema']['minimum'] = $pdetails['minimum'];
@@ -277,11 +272,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 										'properties' => $pdetails['items']['properties']
 									);
 									$parameter['schema']['items']['properties'] = $this->cleanParameter($parameter['schema']['items']['properties']);
-									// foreach ($parameter['schema']['items']['properties'] as $key => $t) {
-									// 	if (is_array($t['type'])) $parameter['schema']['items']['properties'][$key]['type'] = $t['type'][0];
-									// 	if (isset($t['context'])) unset($parameter['schema']['items']['properties'][$key]['context']);
-									// 	if (isset($t['readonly'])) unset($parameter['schema']['items']['properties'][$key]);
-									// }
 								}
 								if (isset($parameter['schema']['default']) && !is_array($parameter['schema']['default']) && $parameter['schema']['default'] != null) {
 									$parameter['schema']['default'] = array($parameter['default']);
@@ -301,9 +291,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 								$parameter['schema']['default'] = "";
 							}
 						}
-						// if (isset($pdetails['enum'])) {
-						// 	$parameter['enum'] = array_values($pdetails['enum']);
-						// }
 
 						if ($methodName === 'POST') {
 							unset($parameter['in']);
@@ -382,6 +369,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						'tags' => array($tags[1]), 'parameters' => $parameters, 'security' => $security, 'responses' => $responses, 'operationId' => $operationId
 					);
 					if ($methodName === 'POST' && !empty($schema)) {
+						$swagger['paths'][$endpointName][strtolower($methodName)]['x-codegen-request-body-name'] = 'body';
 						$swagger['paths'][$endpointName][strtolower($methodName)]['requestBody'] = array(
 							// 'in' => 'body',
 							// 'name' => 'body',
@@ -389,7 +377,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 								'application/json' => array(
 									'schema' => array(
 										'type' => 'object',
-										// 'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")),
+										'title' => ucfirst(strtolower($methodName)) . array_reduce(explode('/', preg_replace("/{(\w+)}/", 'by/${1}', $endpointName)), array($this, "compose_operation_name")),
 										'properties' => $properties
 									)
 								)
