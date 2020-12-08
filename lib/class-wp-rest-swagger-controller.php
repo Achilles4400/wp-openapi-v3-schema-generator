@@ -309,7 +309,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							}
 						}
 					}
-;
+
 					if ($methodName === 'POST' && !empty($schema)) {
 						$this->removeDuplicates($schema);
 						$properties = array();
@@ -412,6 +412,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				$properties[$key]['properties'] = $this->cleanParameter($properties[$key]['properties']);
 			} else {
 				if (is_array($t['type'])) $properties[$key]['type'] = $t['type'][0];
+				if ($t['type'] == 'mixed') $properties[$key]['type'] = 'string';
 				if (isset($t['context'])) unset($properties[$key]['context']);
 				if (isset($t['readonly'])) unset($properties[$key]);
 			}
