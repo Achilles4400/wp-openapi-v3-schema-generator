@@ -84,17 +84,12 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				'version' => '1.0',
 				'title' => $title
 			),
-			// 'host' => $host,
 			'tags' => [],
 			'servers' => array(
 				array(
 					'url' => get_rest_url()
 				)
 			),
-			// 'basePath' => $basePath,
-			// 'schemes' => array((is_ssl() | force_ssl_admin()) ? 'https' : 'http'),
-			// 'consumes' => array('application/json', 'multipart/form-data'),
-			// 'produces' => array('application/json'),
 			'paths' => array(),
 			'components' => array(
 				'schemas' => array(
@@ -488,11 +483,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				$prop['properties'] = new stdClass();
 			}
 
-			// if (isset($prop['items'])) {
-			// 	$prop['type'] = 'array';
-			// 	unset($prop['default']);
-			// }
-
 			//-- Changes by Richi
 			if (!empty($prop['enum'])) {
 				if (isset($prop['enum'][0]) && $prop['enum'][0] == "") {
@@ -530,10 +520,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			if (isset($prop['enum'])) {
 				$prop['enum'] = array_values($prop['enum']);
 			}
-			//			else if(!empty($prop['context']) && $prop['format']!='date-time'){
-			//				//$prop['enum']=$prop['context'];
-			//
-			//			}
 			if (isset($prop['required'])) unset($prop['required']);
 			if (isset($prop['readonly'])) unset($prop['readonly']);
 			if (isset($prop['context'])) unset($prop['context']);
