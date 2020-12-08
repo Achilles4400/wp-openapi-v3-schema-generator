@@ -467,6 +467,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			if (is_array($prop['default'])) unset($prop['default']);
 			if (is_array($prop['type'])) $prop['type'] = $prop['type'][0];
 			if (empty($prop['default'])) unset($prop['default']);
+			if ($prop['type'] == 'mixed') $prop['type'] = 'string';
 
 			if (!empty($prop['properties'])) {
 				$prop['type'] = 'object';
