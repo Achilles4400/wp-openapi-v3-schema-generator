@@ -248,6 +248,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 					//Clean up parameters
 					foreach ($endpointPart['args'] as $pname => $pdetails) {
+						// var_dump($pdetails);
+						if ($pdetails['name'] == 'method_id') {
+						}
 
 						$parameter = array(
 							'name' => $pname, 'type' => 'string', 'in' => $methodName == 'POST' ? 'formData' : 'query'
@@ -290,6 +293,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							} elseif (is_array($pdetails['type']) && in_array('string', $pdetails['type'])) {
 								$parameter['schema']['type'] = 'string';
 								$parameter['schema']['format'] = 'date-time';
+							} else if ($pdetails['type'] == 'null') {
+								$parameter['schema']['type'] = 'string';
+								$parameter['schema']['nullable'] = true;
 							} else {
 								$parameter['schema']['type'] = $pdetails['type'];
 							}
@@ -315,7 +321,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						$properties = array();
 						foreach ($schema as $index => $t) {
 							$properties[$t['name']] = $t;
-							$properties[$t['name']]['type'] = $properties[$t['name']]['schema']['type'];
+							if (empty($properties[$t['name']]['type'])) $properties[$t['name']]['type'] = $properties[$t['name']]['schema']['type'];
 							if (!empty($properties[$t['name']]['schema']['items'])) $properties[$t['name']]['items'] = $properties[$t['name']]['schema']['items'];
 							if (!empty($properties[$t['name']]['schema']['enum'])) $properties[$t['name']]['enum'] = $properties[$t['name']]['schema']['enum'];
 							unset($properties[$t['name']]['schema']['type']);
@@ -378,8 +384,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					if ($methodName === 'POST' && !empty($schema)) {
 						$swagger['paths'][$endpointName][strtolower($methodName)]['x-codegen-request-body-name'] = 'body';
 						$swagger['paths'][$endpointName][strtolower($methodName)]['requestBody'] = array(
-							// 'in' => 'body',
-							// 'name' => 'body',
 							'content' => array(
 								'application/json' => array(
 									'schema' => array(
@@ -401,7 +405,6 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 	}
 
 	private function cleanParameter($properties) {
-		// var_dump($properties);
 		foreach ($properties as $key => $t) {
 			if ($properties[$key]['type'] == 'array') {
 				if ($properties[$key]['items']['type'] == 'object') {
@@ -413,6 +416,10 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			} else {
 				if (is_array($t['type'])) $properties[$key]['type'] = $t['type'][0];
 				if ($t['type'] == 'mixed') $properties[$key]['type'] = 'string';
+				if ($properties[$key]['type'] == 'null') {
+					$properties[$key]['type'] = 'string';
+					$properties[$key]['nullable'] = true;
+				}
 				if (isset($t['context'])) unset($properties[$key]['context']);
 				if (isset($t['readonly'])) unset($properties[$key]);
 			}
@@ -468,6 +475,10 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			if (is_array($prop['type'])) $prop['type'] = $prop['type'][0];
 			if (empty($prop['default'])) unset($prop['default']);
 			if ($prop['type'] == 'mixed') $prop['type'] = 'string';
+			if ($prop['type'] == 'null') {
+				$prop['type'] = 'string';
+				$prop['nullable'] = true;
+			}
 
 			if (!empty($prop['properties'])) {
 				$prop['type'] = 'object';
