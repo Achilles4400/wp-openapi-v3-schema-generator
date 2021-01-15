@@ -210,7 +210,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			$defaultidParams = array();
 			//Replace endpoints var and add to the parameters required
 			$endpointName = preg_replace_callback(
-				'#\(\?P<(\w+?)>.*?\)#',
+				'#\(\?P<(\w+?)>.*?\)(\?\))?#',
 				function ($matches) use (&$defaultidParams) {
 					$defaultidParams[] = array(
 						'name' => $matches[1],
