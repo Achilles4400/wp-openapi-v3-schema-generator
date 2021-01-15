@@ -243,12 +243,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 					//Clean up parameters
 					foreach ($endpointPart['args'] as $pname => $pdetails) {
-						// var_dump($pdetails);
-						if ($pdetails['name'] == 'method_id') {
-						}
 
 						$parameter = array(
-							'name' => $pname, 'type' => 'string', 'in' => $methodName == 'POST' ? 'formData' : 'query'
+							'name' => $pname, 'in' => $methodName == 'POST' ? 'formData' : 'query'
 						);
 						if (!empty($pdetails['description'])) $parameter['description'] = $pdetails['description'];
 						if (!empty($pdetails['format'])) $parameter['schema']['format'] = $pdetails['format'];
