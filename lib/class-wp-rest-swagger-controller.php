@@ -210,7 +210,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			$defaultidParams = array();
 			//Replace endpoints var and add to the parameters required
 			$endpointName = preg_replace_callback(
-				'#\(\?P<(\w+?)>.*\?\)#',
+				'#\(\?P<(\w+?)>.*?\)#',
 				function ($matches) use (&$defaultidParams) {
 					$defaultidParams[] = array(
 						'name' => $matches[1],
@@ -278,7 +278,14 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 									$parameter['schema']['default'] = array($parameter['default']);
 								}
 							} elseif ($pdetails['type'] == 'object') {
-								$parameter['schema']['type'] = 'string';
+								if (isset($pdetails['properties'])) {
+									$parameter['schema']['type'] = 'object';
+									$parameter['schema']['properties'] = $pdetails['properties'];
+									$parameter['schema']['properties'] = $this->cleanParameter($parameter['schema']['properties']);
+								}
+								if (!isset($pdetails['properties'])) {
+									$parameter['schema']['type'] = 'string';
+								}
 							} elseif ($pdetails['type'] == 'date-time') {
 								$parameter['schema']['type'] = 'string';
 								$parameter['schema']['format'] = 'date-time';
@@ -316,6 +323,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							if (empty($properties[$t['name']]['type'])) $properties[$t['name']]['type'] = $properties[$t['name']]['schema']['type'];
 							if (!empty($properties[$t['name']]['schema']['items'])) $properties[$t['name']]['items'] = $properties[$t['name']]['schema']['items'];
 							if (!empty($properties[$t['name']]['schema']['enum'])) $properties[$t['name']]['enum'] = $properties[$t['name']]['schema']['enum'];
+							if (!empty($properties[$t['name']]['schema']['properties'])) $properties[$t['name']]['properties'] = $properties[$t['name']]['schema']['properties'];
 							unset($properties[$t['name']]['schema']['type']);
 							unset($properties[$t['name']]['name']);
 							unset($properties[$t['name']]['schema']);
@@ -413,6 +421,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					$properties[$key]['nullable'] = true;
 				}
 				if (isset($t['context'])) unset($properties[$key]['context']);
+				if (isset($t['sanitize_callback'])) unset($properties[$key]['sanitize_callback']);
+				if (isset($t['validate_callback'])) unset($properties[$key]['validate_callback']);
+				if (isset($t['required'])) unset($properties[$key]['required']);
 				if (isset($t['readonly'])) unset($properties[$key]);
 			}
 		}
