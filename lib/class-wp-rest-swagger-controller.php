@@ -320,7 +320,13 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						$properties = array();
 						foreach ($schema as $index => $t) {
 							$properties[$t['name']] = $t;
-							if (empty($properties[$t['name']]['type'])) $properties[$t['name']]['type'] = $properties[$t['name']]['schema']['type'];
+							if (empty($properties[$t['name']]['type'])) {
+								if (!empty($properties[$t['name']]['schema']['type'])) {
+									$properties[$t['name']]['type'] = $properties[$t['name']]['schema']['type'];
+								} else {
+									$properties[$t['name']]['type'] = 'string';
+								}
+							}
 							if (!empty($properties[$t['name']]['schema']['items'])) $properties[$t['name']]['items'] = $properties[$t['name']]['schema']['items'];
 							if (!empty($properties[$t['name']]['schema']['enum'])) $properties[$t['name']]['enum'] = $properties[$t['name']]['schema']['enum'];
 							if (!empty($properties[$t['name']]['schema']['properties'])) $properties[$t['name']]['properties'] = $properties[$t['name']]['schema']['properties'];
@@ -414,7 +420,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 			if ($properties[$key]['type'] == 'object') {
 				$properties[$key]['properties'] = $this->cleanParameter($properties[$key]['properties']);
 			} else {
-				if (is_array($t['type'])) $properties[$key]['type'] = $t['type'][0];
+				if (is_array($t['type'])) $properties[$key]['type'] = 'string';
 				if ($t['type'] == 'mixed') $properties[$key]['type'] = 'string';
 				if ($properties[$key]['type'] == 'null') {
 					$properties[$key]['type'] = 'string';
