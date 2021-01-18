@@ -10,8 +10,5 @@
       "homepage": "https://github.com/Achilles4400"
     }
   ],
-  "type": "wordpress-plugin",
-  "require": {
-    "composer/installers": "v1.0.6"
-  }
+  "type": "wordpress-plugin"
 }
