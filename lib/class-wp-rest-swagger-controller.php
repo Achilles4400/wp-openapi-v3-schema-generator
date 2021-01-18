@@ -217,7 +217,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						'in' => 'path',
 						'required' => true,
 						'schema' => array(
-							'type' => 'string'
+							'type' => 'integer'
 						)
 					);
 					return '{' . $matches[1] . '}';
@@ -243,10 +243,15 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 
 					//Clean up parameters
 					foreach ($endpointPart['args'] as $pname => $pdetails) {
-
+						if (isset($parameters[$key]) && $parameters[$key]['in'] == 'path') {
+							if (strpos($pname, 'id') !== false) {
+								$parameters[$key]["schema"]["type"] = "integer";
+							}
+						}
 						$parameter = array(
 							'name' => $pname, 'in' => $methodName == 'POST' ? 'formData' : 'query'
 						);
+						$key = array_search($pname, array_column($parameters, 'name'));
 						if (!empty($pdetails['description'])) $parameter['description'] = $pdetails['description'];
 						if (!empty($pdetails['format'])) $parameter['schema']['format'] = $pdetails['format'];
 						if (!empty($pdetails['default'])) $parameter['schema']['default'] = $pdetails['default'];

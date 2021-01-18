@@ -4,7 +4,7 @@
  * Description: Cobeia Swagger schema for the WP REST API
  * Author: Vincent Bathellier
  * Author URI: 
- * Version: 2.0.6
+ * Version: 2.0.7
  * Plugin URI: https://github.com/Achilles4400/wp-api-swaggerui.git
  * License: Cobeia
  */
