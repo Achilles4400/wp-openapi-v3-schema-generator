@@ -1,4 +1,4 @@
-# Cobeia WPAPI-SwaggerGenerator
+# Cobeia wp-openapi-v3-schema-generator
 Generate a swagger file for your Wordpress, based on the plugins installed.
 
 Download the zip file and install using the plugins install upload.

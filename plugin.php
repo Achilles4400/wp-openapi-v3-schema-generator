@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: Cobeia WP REST API - Swagger generate
- * Description: Cobeia Swagger schema for the WP REST API
+ * Plugin Name: wp-openapi-v3-schema-generator
+ * Description: Cobeia Open API v3 generator for the WP REST API
  * Author: Vincent Bathellier
  * Author URI: 
- * Version: 2.0.8
+ * Version: 2.0.9
  * Plugin URI: https://github.com/Achilles4400/wp-api-swaggerui.git
  * License: Cobeia
  */
