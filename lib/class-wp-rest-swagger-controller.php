@@ -25,7 +25,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				'args'                => $this->get_swagger_params(),
 			),
 
-			'schema' => array($this, 'get_swagger_schema'),
+			'schema' => '',
 		));
 	}
 
