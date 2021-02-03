@@ -2,7 +2,7 @@
   "name": "achilles4400/wp-openapi-v3-schema-generator",
   "description": "Generate a swagger file for your Wordpress, based on the plugins installed.",
   "keywords": ["wordpress", "plugin", "cobeia", "API", "swagger"],
-  "homepage": "https://github.com/Achilles4400/wp-api-swaggerui.git",
+  "homepage": "https://github.com/Achilles4400/wp-openapi-v3-schema-generator.git",
   "license": "Cobeia",
   "authors": [
     {
