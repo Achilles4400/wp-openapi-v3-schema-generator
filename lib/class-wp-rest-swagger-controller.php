@@ -283,12 +283,12 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 									$parameter['schema']['default'] = array($parameter['default']);
 								}
 							} elseif ($pdetails['type'] == 'object') {
-								if (isset($pdetails['properties'])) {
+								if (isset($pdetails['properties']) || !empty($pdetails['properties'])) {
 									$parameter['schema']['type'] = 'object';
 									$parameter['schema']['properties'] = $pdetails['properties'];
 									$parameter['schema']['properties'] = $this->cleanParameter($parameter['schema']['properties']);
 								}
-								if (!isset($pdetails['properties'])) {
+								if (!isset($pdetails['properties']) || empty($pdetails['properties'])) {
 									$parameter['schema']['type'] = 'string';
 								}
 							} elseif ($pdetails['type'] == 'date-time') {
@@ -499,7 +499,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				unset($prop['default']);
 				$prop = $this->schemaIntoDefinition($prop);
 			} else if (isset($prop['properties'])) {
-				$prop['properties'] = new stdClass();
+				$prop['properties'] = array('id' => array('type' => 'integer'));
+				// $prop['properties'] = new stdClass();
 			}
 
 			//-- Changes by Richi
@@ -517,7 +518,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				unset($prop['default']);
 			}
 			//--
-			if ($prop['type'] == 'object' && !isset($prop['properties'])) {
+			if ($prop['type'] == 'object' && (!isset($prop['properties']) || empty($prop['properties']))) {
 				if (!empty($prop['items'])) unset($prop['items']);
 				$prop['properties'] = array('id' => array('type' => 'integer'));
 			}
