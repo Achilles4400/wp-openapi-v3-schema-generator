@@ -471,10 +471,14 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		if (!empty($schema['$schema'])) unset($schema['$schema']);
 		if (!empty($schema['links'])) unset($schema['links']);
 		if (!empty($schema['readonly'])) unset($schema['readonly']);
+		if (!empty($schema['context'])) unset($schema['context']);
 		// if(!empty($schema['title']))unset($schema['title']);
 
 		if (empty($schema['properties'])) {
 			$schema['properties'] = new stdClass();
+		}
+		if (isset($schema['items'])) {
+			unset($schema['items']);
 		}
 
 		foreach ($schema['properties'] as $name => &$prop) {
