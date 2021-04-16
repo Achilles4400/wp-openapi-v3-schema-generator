@@ -265,6 +265,14 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 							$parameter['schema']['maximum'] = $pdetails['maximum'];
 							$parameter['schema']['format'] = 'number';
 						}
+						if (is_array($pdetails['type'])) {
+							if (in_array('integer', $pdetails['type'])) {
+								$pdetails['type'] = 'integer';
+							}
+							elseif (in_array('array', $pdetails['type'])) {
+								$pdetails['type'] = 'array';
+							}
+						}
 						if (!empty($pdetails['type'])) {
 							if ($pdetails['type'] == 'array') {
 								$parameter['schema']['type'] = $pdetails['type'];
