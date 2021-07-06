@@ -3,20 +3,23 @@
 /**
  * Swagger base class.
  */
-class WP_REST_Swagger_Controller extends WP_REST_Controller {
+class WP_REST_Swagger_Controller extends WP_REST_Controller
+{
 
 
 	/**
 	 * Construct the API handler object.
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		$this->namespace = 'apigenerate';
 	}
 
 	/**
 	 * Register the meta-related routes.
 	 */
-	public function register_routes() {
+	public function register_routes()
+	{
 		register_rest_route($this->namespace, '/swagger', array(
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -29,16 +32,19 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		));
 	}
 
-	public function get_swagger_params() {
+	public function get_swagger_params()
+	{
 		$new_params = array();
 		return $new_params;
 	}
 
-	public function get_swagger_permissions_check($request) {
+	public function get_swagger_permissions_check($request)
+	{
 		return true;
 	}
 
-	function getSiteRoot($path = '') {
+	function getSiteRoot($path = '')
+	{
 		global $wp_rewrite;
 		$rootURL = site_url();
 
@@ -49,7 +55,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		return $rootURL;
 	}
 
-	private function compose_operation_name($carry, $part) {
+	private function compose_operation_name($carry, $part)
+	{
 		$carry .= ucfirst(strtolower($part));
 		return $carry;
 	}
@@ -60,7 +67,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request
 	 * @return WP_REST_Request|WP_Error Meta object data on success, WP_Error otherwise
 	 */
-	public function get_swagger($request) {
+	public function get_swagger($request)
+	{
 
 		global $wp_rewrite;
 		//		
@@ -75,7 +83,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		}
 
 		$basePath = parse_url(get_rest_url(), PHP_URL_PATH);
-		$basePath = str_replace('index.php/', '',$basePath);
+		$basePath = str_replace('index.php/', '', $basePath);
 		$basePath = rtrim($basePath, '/');
 
 		$swagger = array(
@@ -180,7 +188,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				continue;
 			}
 			if (defined('COBEIA_API_SCHEMA')) {
-				if (!array_filter(COBEIA_API_SCHEMA, function($filter_endpoint) use ($endpointName) {
+				if (!array_filter(COBEIA_API_SCHEMA, function ($filter_endpoint) use ($endpointName) {
 					if (strpos($endpointName, $filter_endpoint) !== false) {
 						return $endpointName;
 					}
@@ -236,7 +244,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 				foreach ($endpointPart['methods'] as $methodName => $method) {
 					if (in_array($methodName, array('PUT', 'PATCH'))) continue; //duplicated by post
 
-					$pathParamName = array_map(function ($param) { return $param['name']; }, $defaultidParams);
+					$pathParamName = array_map(function ($param) {
+						return $param['name'];
+					}, $defaultidParams);
 
 					$parameters = $defaultidParams;
 					$schema = array();
@@ -268,8 +278,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 						if (is_array($pdetails['type'])) {
 							if (in_array('integer', $pdetails['type'])) {
 								$pdetails['type'] = 'integer';
-							}
-							elseif (in_array('array', $pdetails['type'])) {
+							} elseif (in_array('array', $pdetails['type'])) {
 								$pdetails['type'] = 'array';
 							}
 						}
@@ -355,7 +364,12 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 					//assume it's returning a list
 					$outputSchemaForMethod = $outputSchema;
 					if ($methodName == 'GET' && !preg_match('/}$/', $endpointName)) {
-						if (!preg_match('/activity\/{id}\/comment/', $endpointName) && !preg_match('/members\/me/', $endpointName) && !preg_match('/users\/me/', $endpointName)) {
+						if (
+							!preg_match('/activity\/{id}\/comment/', $endpointName) &&
+							!preg_match('/members\/me/', $endpointName) &&
+							!preg_match('/users\/me/', $endpointName) &&
+							!preg_match('/messages\/search-thread/', $endpointName)
+						) {
 							$outputSchemaForMethod = array(
 								'type' => 'array', 'items' => $outputSchemaForMethod
 							);
@@ -423,7 +437,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		return apply_filters('rest_prepare_meta_value', $response, $request);
 	}
 
-	private function cleanParameter($properties) {
+	private function cleanParameter($properties)
+	{
 		foreach ($properties as $key => $t) {
 			if ($properties[$key]['type'] == 'array') {
 				if ($properties[$key]['items']['type'] == 'object') {
@@ -449,7 +464,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 		return $properties;
 	}
 
-	private function removeDuplicates($params) {
+	private function removeDuplicates($params)
+	{
 		$isdupblicate = array();
 		foreach ($params as $index => $t) {
 			if (isset($isdupblicate[$t["name"]])) {
@@ -475,7 +491,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 	 * @param array $schema
 	 * @return array Definition
 	 */
-	private function schemaIntoDefinition($schema) {
+	private function schemaIntoDefinition($schema)
+	{
 		if (!empty($schema['$schema'])) unset($schema['$schema']);
 		if (!empty($schema['links'])) unset($schema['links']);
 		if (!empty($schema['readonly'])) unset($schema['readonly']);
@@ -565,7 +582,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller {
 	 *
 	 * @return array
 	 */
-	public function get_swagger_schema() {
+	public function get_swagger_schema()
+	{
 		$schema = json_decode(file_get_contents(dirname(__FILE__) . '/schema.json'), 1);
 		return $schema;
 	}
