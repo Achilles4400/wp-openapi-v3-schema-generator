@@ -259,7 +259,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 							}
 						}
 						$parameter = array(
-							'name' => $pname, 'in' => $methodName == 'POST' ? 'formData' : 'query'
+							'name' => $pname, 'in' => $methodName == 'POST' ? 'formData' : 'query', 'style' => 'form', 'explode' => 'false'
 						);
 						$key = array_search($pname, array_column($parameters, 'name'));
 						if (!empty($pdetails['description'])) $parameter['description'] = $pdetails['description'];
@@ -328,6 +328,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 						if (!in_array($parameter['name'], $pathParamName)) {
 							if ($methodName === 'POST') {
 								unset($parameter['in']);
+								unset($parameter['explode']);
+								unset($parameter['style']);
 								unset($parameter['required']);
 								array_push($schema, $parameter);
 							} else {
