@@ -579,6 +579,9 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 				$prop['type'] = 'string';
 				$prop['format'] = 'date-time';
 			}
+			if ($prop['type'] == 'bool') {
+				$prop['type'] = 'boolean';
+			}
 			if (isset($prop['enum'])) {
 				$prop['enum'] = array_values($prop['enum']);
 			}
