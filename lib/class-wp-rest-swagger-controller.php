@@ -304,6 +304,8 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 									$parameter['schema']['type'] = 'object';
 									$parameter['schema']['properties'] = $pdetails['properties'];
 									$parameter['schema']['properties'] = $this->cleanParameter($parameter['schema']['properties']);
+								} else {
+									$parameter['schema']['type'] = 'string';
 								}
 								if (!isset($pdetails['properties']) || empty($pdetails['properties'])) {
 									$parameter['schema']['type'] = 'string';
@@ -448,7 +450,12 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 				}
 			}
 			if ($properties[$key]['type'] == 'object') {
-				$properties[$key]['properties'] = $this->cleanParameter($properties[$key]['properties']);
+				if (isset($properties[$key]['context'])) unset($properties[$key]['context']);
+				if (isset($properties[$key]['properties']) || !empty($properties[$key]['properties'])) {
+					$properties[$key]['properties'] = $this->cleanParameter($properties[$key]['properties']);
+				} else {
+					$properties[$key]['type'] = 'string';
+				}
 			} else {
 				if (is_array($t['type'])) $properties[$key]['type'] = 'string';
 				if ($t['type'] == 'mixed') $properties[$key]['type'] = 'string';
@@ -557,7 +564,11 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 				if (isset($prop['items']['type']) && $prop['items']['type'] === 'object') {
 					$prop['items'] = $this->schemaIntoDefinition($prop['items']);
 				} else if (isset($prop['items']['type'])) {
-					$prop['items'] = array('type' => $prop['items']['type']);
+					if (is_array($prop['items']['type'])) {
+						$prop['items'] = array('type' => $prop['items']['type'][1]);
+					} else {
+						$prop['items'] = array('type' => $prop['items']['type']);
+					}
 				} else {
 					$prop['items'] = array('type' => 'string');
 				}
