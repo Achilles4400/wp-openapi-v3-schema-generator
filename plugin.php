@@ -5,7 +5,7 @@
  * Description: Cobeia Open API v3 generator for the WP REST API
  * Author: Vincent Bathellier
  * Author URI: 
- * Version: 2.0.14
+ * Version: 2.0.15
  * Plugin URI: https://github.com/Achilles4400/wp-api-swaggerui.git
  * License: Cobeia
  */

@@ -441,7 +441,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 
 	private function cleanParameter($properties)
 	{
-		foreach ($properties as $key => $t) {
+		foreach ((array) $properties as $key => $t) {
 			if ($properties[$key]['type'] == 'array') {
 				if ($properties[$key]['items']['type'] == 'object') {
 					$properties[$key]['items']['properties'] = $this->cleanParameter($properties[$key]['items']['properties']);
