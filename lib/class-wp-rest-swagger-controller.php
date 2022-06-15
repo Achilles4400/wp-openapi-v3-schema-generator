@@ -71,7 +71,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 	{
 
 		global $wp_rewrite;
-		//		
+		//
 		//		if($wp_rewrite->root!='/'){
 		//			$basePath = '/'.$wp_rewrite->root;//'/'.$matches[1].'/';
 		//		}
@@ -210,7 +210,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 					$outputSchema = array('$ref' => '#/components/schemas/' . $schema['title']);
 				}
 			} else {
-				//if there is no schema then it's a safe bet that this API call 
+				//if there is no schema then it's a safe bet that this API call
 				//will not work - move to the next one.
 				continue;
 			}
@@ -364,7 +364,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 						$this->removeDuplicates($parameters);
 					}
 
-					//If the endpoint is not grabbing a specific object then 
+					//If the endpoint is not grabbing a specific object then
 					//assume it's returning a list
 					$outputSchemaForMethod = $outputSchema;
 					if ($methodName == 'GET' && !preg_match('/}$/', $endpointName)) {
@@ -525,7 +525,7 @@ class WP_REST_Swagger_Controller extends WP_REST_Controller
 			if (!empty($prop['items']['context'])) unset($prop['items']['context']);
 			if (is_array($prop['default'])) unset($prop['default']);
 			if (is_array($prop['type'])) $prop['type'] = $prop['type'][0];
-			if (empty($prop['default'])) unset($prop['default']);
+			if (isset($prop['default']) && empty($prop['default'])) unset($prop['default']);
 			if ($prop['type'] == 'mixed') $prop['type'] = 'string';
 			if ($prop['type'] == 'null') {
 				$prop['type'] = 'string';
